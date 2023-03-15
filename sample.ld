@@ -1,5 +1,3 @@
-OUTPUT_ARCH (mips)
-
 /* Starts a segment */
 #define BEGIN_SEG(name, addr) \
     _##name##SegmentStart = ADDR(.name); \
@@ -41,16 +39,16 @@ SECTIONS
       */libultra_rom.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
       */libgcc.a:*.o(.text);
-      /usr/lib/n64/PR/rspboot.o(.text);
-      /usr/lib/n64/hvqm/hvqm2sp1.o(.text);
+      lib/libultra/lib/rspboot.o(.text);
+      lib/libhvqm/lib/hvqm2sp1.o(.text);
 
       /* data */
       BUILD_DIR/src/main*.o(.data*);
 
       */libultra_rom.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
-      /usr/lib/n64/PR/rspboot.o(.data*);
-      /usr/lib/n64/hvqm/hvqm2sp1.o(.data*);
+      lib/libultra/lib/rspboot.o(.data*);
+      lib/libhvqm/lib/hvqm2sp1.o(.data*);
 
       /* rodata */
       BUILD_DIR/src/main*.o(.*rodata*);

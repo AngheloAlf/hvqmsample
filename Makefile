@@ -19,6 +19,9 @@ CFB_FORMAT = 1
 MAXWIDTH  = 320
 MAXHEIGHT = 240
 
+MIPS_BINUTILS_PREFIX ?= mips-linux-gnu-
+
+
 TARGET_STRING := sample
 TARGET := $(TARGET_STRING)
 
@@ -28,7 +31,7 @@ DEFINES := _FINALROM=1 NDEBUG=1 F3DEX_GBI_2=1 MAXWIDTH=$(MAXWIDTH) MAXHEIGHT=$(M
 SRC_DIRS :=
 
 # Whether to hide commands or not
-VERBOSE ?= 0
+VERBOSE ?= 1
 ifeq ($(VERBOSE),0)
   V := @
 endif
@@ -44,7 +47,7 @@ BUILD_DIR := build
 ROM            := $(BUILD_DIR)/$(TARGET_STRING).z64
 ELF            := $(BUILD_DIR)/$(TARGET_STRING).elf
 LD_SCRIPT      := $(TARGET_STRING).ld
-BOOT		:= /usr/lib/n64/PR/bootcode/boot.6102
+BOOT		:= lib/bootcode/boot.6102
 BOOT_OBJ	:= $(BUILD_DIR)/boot.6102.o
 
 # Directories containing source files
@@ -68,15 +71,15 @@ DEP_FILES := $(O_FILES:.o=.d) $(ASM_O_FILES:.o=.d)  $(BUILD_DIR)/$(LD_SCRIPT).d
 # Compiler Options                                                             #
 #==============================================================================#
 
-AS        := mips-n64-as
-CC        := mips-n64-gcc
-CPP       := cpp
-LD        := mips-n64-ld
-AR        := mips-n64-ar
-OBJDUMP   := mips-n64-objdump
-OBJCOPY   := mips-n64-objcopy
+AS        := $(MIPS_BINUTILS_PREFIX)as
+CC        := $(MIPS_BINUTILS_PREFIX)gcc
+CPP       := $(MIPS_BINUTILS_PREFIX)cpp
+LD        := $(MIPS_BINUTILS_PREFIX)ld
+AR        := $(MIPS_BINUTILS_PREFIX)ar
+OBJDUMP   := $(MIPS_BINUTILS_PREFIX)objdump
+OBJCOPY   := $(MIPS_BINUTILS_PREFIX)objcopy
 
-INCLUDE_DIRS += /usr/include/n64 /usr/include/n64/hvqm include $(BUILD_DIR) $(BUILD_DIR)/include src .
+INCLUDE_DIRS += lib/libultra/include lib/libultra/include/PR lib/libhvqm/include include $(BUILD_DIR) $(BUILD_DIR)/include src .
 
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
@@ -125,40 +128,40 @@ DUMMY != mkdir -p $(ALL_DIRS)
 
 # Compile C code
 $(BUILD_DIR)/%.o: %.c
-	$(call print,Compiling:,$<,$@)
+##	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
-	$(call print,Compiling:,$<,$@)
+##	$(call print,Compiling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Assemble assembly code
 $(BUILD_DIR)/%.o: %.s
-	$(call print,Assembling:,$<,$@)
+#	$(call print,Assembling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Run linker script through the C preprocessor
 $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT)
-	$(call print,Preprocessing linker script:,$<,$@)
+#	$(call print,Preprocessing linker script:,$<,$@)
 	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 $(BOOT_OBJ): $(BOOT)
-	$(V)$(OBJCOPY) -I binary -B mips -O elf32-bigmips $< $@
+	$(V)$(OBJCOPY) -I binary -B mips -O elf32-big $< $@
 
 # convert binary hvqm to object file
 $(BUILD_DIR)/assets/%.hvqm.o: assets/%.hvqm
-	$(call print,Converting HVQM to ELF:,$<,$@)
+#	$(call print,Converting HVQM to ELF:,$<,$@)
 	$(V)$(LD) -r -b binary $< -o $@
 
 # Link final ELF file
 $(ELF): $(O_FILES) $(HVQM_OBJ_FILES) $(BUILD_DIR)/$(LD_SCRIPT)
-	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/$(TARGET).map --no-check-sections -o $@ $(O_FILES) -L/usr/lib/n64 -lultra_rom -L$(N64_LIBGCCDIR) -lgcc -L/usr/lib/n64/hvqm -lhvqm2
+#	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
+	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) -Map $(BUILD_DIR)/$(TARGET).map --no-check-sections -o $@ $(O_FILES) -Llib/libultra/lib -lgultra_rom -L$(N64_LIBGCCDIR) -lgcc -Llib/libhvqm/lib -lhvqm2
 
 # Build ROM
 $(ROM): $(ELF)
-	$(call print,Building ROM:,$<,$@)
+#	$(call print,Building ROM:,$<,$@)
 	$(V)$(OBJCOPY) --pad-to=0x100000 --gap-fill=0xFF $< $@ -O binary
-	$(V)makemask $@
+#	$(V)makemask $@
 
 .PHONY: clean default
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
