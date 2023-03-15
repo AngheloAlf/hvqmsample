@@ -1,23 +1,22 @@
-#include <system.h>
-# assembler directives
-# .set noat      # allow manual use of $at
-# .set noreorder # don't insert nops after branches
-# .set gp=64
-
-.include "macros.inc"
+#include "hasm.h"
 
 .section .start, "ax"
 
-glabel __start
-	la $t0, _codeSegmentBssStart
+.balign 16
+
+LEAF(__start)
+    la $t0, _codeSegmentBssStart
     la $t1, _codeSegmentBssSize
-bss_clear:
-    addi $t1, $t1, -8
-    sw $zero, ($t0)
-    sw $zero, 4($t0)
-    bnez $t1, bss_clear
-	addi $t0, $t0, 8
-    la $t2, boot #Boot function address
-	la $sp, bootStack+STACKSIZE #Setup boot stack pointer, change stack size if needed here
-    jr $t2
-    nop
+
+.clear_bss:
+    sw      $zero, 0x0($t0)
+    sw      $zero, 0x4($t0)
+    addi    $t0, $t0, 0x8
+    addi    $t1, $t1, -0x8
+    bnez    $t1, .clear_bss
+
+.enter_program:
+    la $t2, boot
+	la $sp, bootStack+STACKSIZE
+    jr      $t2
+END(__start)

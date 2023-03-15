@@ -36,36 +36,40 @@ SECTIONS
 		BUILD_DIR/asm/entry.o(.start);
       BUILD_DIR/src/main*.o(.text);
 
-      */libultra_rom.a:*.o(.text);
+      */libgultra_rom.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
-      */libgcc.a:*.o(.text);
-      lib/libultra/lib/rspboot.o(.text);
-      lib/libhvqm/lib/hvqm2sp1.o(.text);
+      BUILD_DIR/src/libkmc*.o(.text);
+      */rspboot.o(.text);
+      */hvqm2sp1.o(.text);
 
       /* data */
       BUILD_DIR/src/main*.o(.data*);
 
-      */libultra_rom.a:*.o(.data*);
+      */libgultra_rom.a:*.o(.data*);
       */libhvqm2.a:*.o(.data*);
-      lib/libultra/lib/rspboot.o(.data*);
-      lib/libhvqm/lib/hvqm2sp1.o(.data*);
+      BUILD_DIR/src/libkmc*.o(.data);
+      */rspboot.o(.data*);
+      */hvqm2sp1.o(.data*);
 
       /* rodata */
       BUILD_DIR/src/main*.o(.*rodata*);
 
-      */libultra_rom.a:*.o(.*rodata*);
+      */libgultra_rom.a:*.o(.*rodata*);
       */libhvqm2.a:*.o(.*rodata*);
-      */libgcc.a:*.o(.*rodata*);
+      BUILD_DIR/src/libkmc*.o(.*rodata*);
    }
    END_SEG(code)
    BEGIN_NOLOAD(code)
    {
       BUILD_DIR/src/main*.o(.*bss*);
 
-      */libultra_rom.a:*.o(COMMON);
-      */libultra_rom.a:*.o(.scommon);
-      */libultra_rom.a:*.o(.*bss*);
+      */libgultra_rom.a:*.o(COMMON);
+      */libgultra_rom.a:*.o(.scommon);
+      */libgultra_rom.a:*.o(.*bss*);
       */libhvqm2.a:*.o(.*bss*);
+      BUILD_DIR/src/libkmc*.o(.COMMON);
+      BUILD_DIR/src/libkmc*.o(.scommon);
+      BUILD_DIR/src/libkmc*.o(.*bss*);
    }
    END_NOLOAD(code)
 
