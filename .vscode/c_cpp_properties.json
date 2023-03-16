@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "include",
+                "lib",
+                "lib/libultra/include",
+                "lib/libultra/include/PR",
+                "lib/libhvqm/include",
+                "."
+            ],
+            "defines": [
+                "_LANGUAGE_C",
+                "_FINALROM"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "compilerPath": "/usr/bin/mips-linux-gnu-gcc",
+            "intelliSenseMode": "linux-gcc-x86",
+            "compilerArgs": [
+                "-m32",
+                "-nostdinc++",
+                "-Wincompatible-pointer-types",
+                "-Werror=incompatible-pointer-types"
+            ],
+            "cStandard": "gnu89"
+        }
+    ],
+    "version": 4
+}
